@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>JAIPUR BANGLORE LOGISTICS - Transport Management System (TMS)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- SheetJS for Excel Exports -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+    <!-- ================================================================= -->
+    <!-- AUTHENTICATION VIEW (LOGIN ONLY) -->
+    <!-- ================================================================= -->
+    <div id="authContainer" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+            <!-- Header Banner -->
+            <div class="bg-blue-600 p-6 text-white text-center">
+                <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-xl mb-3 shadow-inner">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-black tracking-tight uppercase">JAIPUR BANGLORE LOGISTICS</h1>
+                <p class="text-blue-100 text-xs mt-1">Enterprise Transport Management &amp; Logistics System</p>
+            </div>
+
+            <!-- Login Form Section -->
+            <div id="loginSection" class="p-6">
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
+                        <input id="loginEmail" type="email" required placeholder="jaipurbanglorelogistic@gmail.com" value="jaipurbanglorelogistic@gmail.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                        <input id="loginPassword" type="password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none">
+                    </div>
+                    <!-- Remember Me Option -->
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2 text-xs text-slate-600 font-semibold cursor-pointer select-none">
+                            <input id="rememberMe" type="checkbox" checked class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-blue-500/25 transition">
+                        Sign In to TMS Portal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MAIN APPLICATION CONTAINER -->
+    <!-- ================================================================= -->
+    <div id="appContainer" class="hidden min-h-screen flex flex-col">
+        
+        <!-- Top App Navigation Bar -->
+        <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Brand & Company Info -->
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow flex-shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
+                                <span class="truncate">JAIPUR BANGLORE LOGISTICS</span>
+                                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded hidden xs:inline-block">TMS</span>
+                            </div>
+                            <div class="text-[11px] sm:text-xs text-slate-400 truncate max-w-[150px] sm:max-w-xs font-medium" id="headerCompanyName">JAIPUR BANGLORE LOGISTICS</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Actions: New Trip, Profile, Logout -->
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <button type="button" class="btn-new-trip inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-bold shadow-md hover:shadow-blue-500/20 transition">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>New Trip</span>
+                        </button>
+
+                        <div id="cloudStatusBadge" class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 text-[11px] sm:text-xs font-semibold rounded-full shadow-sm" title="Connected to Supabase Cloud Database">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="hidden sm:inline">Supabase Live</span>
+                        </div>
+
+                        <!-- User Profile Tag -->
+                        <div class="flex items-center gap-2 pl-2 sm:pl-3 border-l border-slate-800">
+                            <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-blue-400" id="profileInitials">
+                                JB
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <div class="text-xs font-semibold text-slate-200" id="headerUserName">Vikram</div>
+                                <div class="text-[10px] text-slate-400">Admin</div>
+                            </div>
+                        </div>
+
+                        <!-- Logout Button -->
+                        <button id="logoutBtn" class="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition" title="Log Out">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Navigation Menu Bar (Horizontal Tabs) -->
+            <div class="bg-white border-b border-slate-200 text-slate-600 shadow-sm overflow-x-auto">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <nav class="flex space-x-1 py-1.5 whitespace-nowrap text-sm font-semibold">
+                        <button data-tab="dashboard" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition active">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <span>Dashboard</span>
+                        </button>
+                        <button data-tab="trips" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                            <span>Trips</span>
+                        </button>
+                        <button data-tab="parties" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            <span>Parties</span>
+                        </button>
+                        <button data-tab="suppliers" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <span>Supplier / Transporter</span>
+                        </button>
+                        <button data-tab="drivers" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span>Drivers</span>
+                        </button>
+                        <button data-tab="trucks" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                            <span>Trucks</span>
+                        </button>
+                        <button data-tab="expenses" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <span>Expenses</span>
+                        </button>
+                        <button data-tab="payments" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Payments</span>
+                        </button>
+                        <button data-tab="reports" class="nav-tab px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span>Reports (P&amp;L)</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+            <!-- ========================================================= -->
+            <!-- 1. DASHBOARD VIEW -->
+            <!-- ========================================================= -->
+            <div id="dashboardView" class="view-container space-y-6">
+                <!-- Top 7 KPI Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    <!-- Total Trips -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-[11px] font-bold uppercase text-slate-400 tracking-wider">Total Trips</div>
+                        <div class="text-2xl font-black text-slate-900 mt-1" id="dashTotalTrips">0</div>
+                        <div class="text-[11px] text-slate-500 mt-1">All time record</div>
+                    </div>
+                    <!-- Active Trips -->
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-gradient-to-br from-amber-50/50 to-white">
+                        <div class="text-[11px] font-bold uppercase text-amber-700 tracking-wider flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                            Active Trips
+                        </div>
+                        <div class="text-2xl font-black text-amber-700 mt-1" id="dashActiveTrips">0</div>
+                        <div class="text-[11px] text-amber-600 mt-1">Currently In Transit</div>
+                    </div>
+                    <!-- Closed Trips -->
+                    <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm bg-gradient-to-br from-emerald-50/50 to-white">
+                        <div class="text-[11px] font-bold uppercase text-emerald-700 tracking-wider">Closed Trips</div>
+                        <div class="text-2xl font-black text-emerald-700 mt-1" id="dashClosedTrips">0</div>
+                        <div class="text-[11px] text-emerald-600 mt-1">Completed &amp; POD done</div>
+                    </div>
+                    <!-- Party Due -->
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 shadow-sm bg-gradient-to-br from-blue-50/50 to-white">
+                        <div class="text-[11px] font-bold uppercase text-blue-700 tracking-wider">Party Due</div>
+                        <div class="text-xl font-black text-blue-800 mt-1 font-mono" id="dashPartyDue">₹0</div>
+                        <div class="text-[11px] text-blue-600 mt-1">Total Receivable</div>
+                    </div>
+                    <!-- Trans Due -->
+                    <div class="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-gradient-to-br from-rose-50/50 to-white">
+                        <div class="text-[11px] font-bold uppercase text-rose-700 tracking-wider">Trans Due</div>
+                        <div class="text-xl font-black text-rose-700 mt-1 font-mono" id="dashTransDue">₹0</div>
+                        <div class="text-[11px] text-rose-600 mt-1">Truck Hire to Pay</div>
+                    </div>
+                    <!-- Net Profit -->
+                    <div class="bg-white p-4 rounded-xl border border-emerald-300 shadow-sm bg-gradient-to-br from-emerald-100/40 to-white">
+                        <div class="text-[11px] font-bold uppercase text-emerald-800 tracking-wider">Net Profit</div>
+                        <div class="text-xl font-black text-emerald-700 mt-1 font-mono" id="dashNetProfit">₹0</div>
+                        <div class="text-[11px] text-emerald-600 mt-1">From Closed Trips</div>
+                    </div>
+                    <!-- Month Revenue -->
+                    <div class="bg-white p-4 rounded-xl border border-indigo-200 shadow-sm bg-gradient-to-br from-indigo-50/50 to-white col-span-2 md:col-span-1">
+                        <div class="text-[11px] font-bold uppercase text-indigo-700 tracking-wider">Month Revenue</div>
+                        <div class="text-xl font-black text-indigo-800 mt-1 font-mono" id="dashMonthRevenue">₹0</div>
+                        <div class="text-[11px] text-indigo-600 mt-1">Current Month</div>
+                    </div>
+                </div>
+
+                <!-- Recent Trips Section -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">Recent Trips &amp; Consignments</h2>
+                            <p class="text-xs text-slate-500">Live operational status and fast actions</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="btn-new-trip px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow transition flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <span>New Trip</span>
+                            </button>
+                            <button onclick="switchTab('trips')" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold">
+                                View All Trips &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>LR / Trip ID</th>
+                                    <th>Route &amp; Date</th>
+                                    <th>Party (Consignor)</th>
+                                    <th>Vehicle &amp; Transporter</th>
+                                    <th>Freight / Due</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTripsTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 2. TRIPS VIEW -->
+            <!-- ========================================================= -->
+            <div id="tripsView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Trip &amp; Consignment Management</h2>
+                        <p class="text-xs text-slate-500">Track end-to-end trip lifecycles, print LRs, and attach verified PODs</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="triggerExportTrips()" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            Export Trips (Excel)
+                        </button>
+                        <button type="button" class="btn-new-trip px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>New Trip</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Toolbar -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+                    <!-- Status Filter Tabs -->
+                    <div class="flex items-center gap-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+                        <button onclick="filterTripsByStatus('all', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white">All</button>
+                        <button onclick="filterTripsByStatus('created', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Created</button>
+                        <button onclick="filterTripsByStatus('in-transit', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">In Transit</button>
+                        <button onclick="filterTripsByStatus('delivered', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Delivered</button>
+                        <button onclick="filterTripsByStatus('pod-done', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">POD Done</button>
+                        <button onclick="filterTripsByStatus('closed', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Closed</button>
+                        <button onclick="filterTripsByStatus('cancelled', this)" class="trip-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Cancel</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="w-full md:w-72 relative">
+                        <input id="tripSearchInput" type="text" placeholder="Search LR, Party, Route, Truck..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Trips Data Table -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>LR / Trip ID</th>
+                                    <th>Route &amp; Cargo</th>
+                                    <th>Consignor Party</th>
+                                    <th>Vehicle &amp; Transporter</th>
+                                    <th>Party Billing</th>
+                                    <th>Truck Hire Cost</th>
+                                    <th>Net Profit</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tripsTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 3. PARTIES VIEW -->
+            <!-- ========================================================= -->
+            <div id="partiesView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Parties &amp; Clients Directory</h2>
+                        <p class="text-xs text-slate-500">Manage consignors, billing terms, GSTINs, and party ledgers</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="triggerExportParties()" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            Export Parties (Excel)
+                        </button>
+                        <button onclick="openModal('addPartyModal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Add Party</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div class="w-full md:w-80 relative">
+                        <input id="partySearchInput" type="text" placeholder="Search by name, phone, city, GST..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Party Name &amp; Address</th>
+                                    <th>Contact Person</th>
+                                    <th>City</th>
+                                    <th>GST / Credit</th>
+                                    <th class="text-center">Total Trips</th>
+                                    <th>Balance Due</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="partiesTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 4. SUPPLIERS / TRANSPORTER VIEW -->
+            <!-- ========================================================= -->
+            <div id="suppliersView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Supplier &amp; Transporter Directory</h2>
+                        <p class="text-xs text-slate-500">Track market transporters, fleet suppliers, bank accounts &amp; payables</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="triggerExportSuppliers()" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
+                            <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            Export Suppliers (Excel)
+                        </button>
+                        <button onclick="openModal('addSupplierModal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Add Transporter</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div class="w-full md:w-80 relative">
+                        <input id="supplierSearchInput" type="text" placeholder="Search supplier name, phone, city..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Supplier Name</th>
+                                    <th>Phone &amp; UPI</th>
+                                    <th>City</th>
+                                    <th class="text-center">Trips</th>
+                                    <th>Balance Due</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppliersTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 5. DRIVERS VIEW -->
+            <!-- ========================================================= -->
+            <div id="driversView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Driver Ledger &amp; Khata</h2>
+                        <p class="text-xs text-slate-500">Track driver advances (Gave), cash settlements (Got), and trip availability</p>
+                    </div>
+                    <button onclick="openModal('addDriverModal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Add Driver</span>
+                    </button>
+                </div>
+
+                <!-- Driver Stat Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-white p-4 rounded-xl border border-rose-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-rose-700 block">Driver Gave</span>
+                        <span class="text-xl font-black text-rose-700 font-mono mt-1 block" id="driverGaveDisplay">₹0</span>
+                        <span class="text-[11px] text-slate-500">Total advances given</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-emerald-700 block">Driver Got</span>
+                        <span class="text-xl font-black text-emerald-700 font-mono mt-1 block" id="driverGotDisplay">₹0</span>
+                        <span class="text-[11px] text-slate-500">Total settled / returned</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-blue-700 block">Total Driver Balance</span>
+                        <span class="text-xl font-black text-blue-800 font-mono mt-1 block" id="driverTotalBalDisplay">₹0</span>
+                        <span class="text-[11px] text-slate-500">Net outstanding balance</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-amber-700 block">On Trip</span>
+                        <span class="text-xl font-black text-amber-700 mt-1 block" id="driverOnTripDisplay">0</span>
+                        <span class="text-[11px] text-slate-500">Currently driving</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm col-span-2 sm:col-span-1">
+                        <span class="text-[11px] font-bold uppercase text-emerald-700 block">Available</span>
+                        <span class="text-xl font-black text-emerald-700 mt-1 block" id="driverAvailableDisplay">0</span>
+                        <span class="text-[11px] text-slate-500">Ready for dispatch</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div class="w-full md:w-80 relative">
+                        <input id="driverSearchInput" type="text" placeholder="Search driver name, mobile, DL..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Driver Name &amp; DL</th>
+                                    <th>Mobile &amp; UPI</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Driver Gave</th>
+                                    <th class="text-right">Driver Got</th>
+                                    <th class="text-right">Net Balance</th>
+                                    <th>Bank Details</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="driversTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 6. TRUCKS FLEET VIEW -->
+            <!-- ========================================================= -->
+            <div id="trucksView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Truck Fleet &amp; Market Vehicles</h2>
+                        <p class="text-xs text-slate-500">Track own trucks, market vehicles, capacity and real-time trip status</p>
+                    </div>
+                    <button onclick="openModal('addTruckModal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Add Truck</span>
+                    </button>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-1 w-full sm:w-auto">
+                        <button onclick="filterTrucksByOwnership('all', this)" class="truck-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white">All Trucks</button>
+                        <button onclick="filterTrucksByOwnership('my', this)" class="truck-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">My Fleet (Own)</button>
+                        <button onclick="filterTrucksByOwnership('market', this)" class="truck-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Market Trucks</button>
+                    </div>
+                    <div class="w-full sm:w-72 relative">
+                        <input id="truckSearchInput" type="text" placeholder="Search truck number, type..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Truck No</th>
+                                    <th>Truck Type &amp; Body</th>
+                                    <th>Capacity</th>
+                                    <th>Ownership</th>
+                                    <th>Supplier / Transporter</th>
+                                    <th>Current Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trucksTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 7. EXPENSES VIEW -->
+            <!-- ========================================================= -->
+            <div id="expensesView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Trip &amp; Vehicle Expenses</h2>
+                        <p class="text-xs text-slate-500">Record and analyze Diesel fuel, Toll plazas, Driver Bhatta &amp; maintenance</p>
+                    </div>
+                    <button onclick="openAddExpenseModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Add Expense</span>
+                    </button>
+                </div>
+
+                <!-- Expense Stat Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-slate-500 block">Total Expenses</span>
+                        <span class="text-xl font-black text-slate-900 font-mono mt-1 block" id="expTotalDisplay">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-amber-700 block">Diesel Fuel</span>
+                        <span class="text-xl font-black text-amber-700 font-mono mt-1 block" id="expDieselDisplay">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-blue-700 block">Fastag / Toll</span>
+                        <span class="text-xl font-black text-blue-700 font-mono mt-1 block" id="expTollDisplay">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-purple-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-purple-700 block">Driver Bhatta</span>
+                        <span class="text-xl font-black text-purple-700 font-mono mt-1 block" id="expDriverDisplay">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-rose-200 shadow-sm col-span-2 sm:col-span-1">
+                        <span class="text-[11px] font-bold uppercase text-rose-700 block">Maintenance / Other</span>
+                        <span class="text-xl font-black text-rose-700 font-mono mt-1 block" id="expOtherDisplay">₹0</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Linked Trip (LR)</th>
+                                    <th>Payment Mode</th>
+                                    <th>Notes / Remarks</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 8. PAYMENTS & SETTLEMENTS VIEW -->
+            <!-- ========================================================= -->
+            <div id="paymentsView" class="view-container hidden space-y-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">Payment Reconciliation &amp; Settlements</h2>
+                    <p class="text-xs text-slate-500">Reconcile customer collections, transporter settlements &amp; pending trip balances</p>
+                </div>
+
+                <!-- Subtabs: Party Receivable | Trans Payable | Pending Trips -->
+                <div class="border-b border-slate-200 flex gap-6 text-sm font-semibold">
+                    <button onclick="switchPaymentTab('party')" data-pay-tab="party" class="payment-tab-btn pb-3 border-b-2 border-blue-600 text-blue-600 font-bold transition">
+                        Party Receivable (Customer Dues)
+                    </button>
+                    <button onclick="switchPaymentTab('trans')" data-pay-tab="trans" class="payment-tab-btn pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+                        Transporter Payable (Truck Hire Dues)
+                    </button>
+                    <button onclick="switchPaymentTab('trips')" data-pay-tab="trips" class="payment-tab-btn pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition">
+                        Pending Trips Overview
+                    </button>
+                </div>
+
+                <!-- Party Receivable Section -->
+                <div id="partyReceivableSection" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Party Name</th>
+                                    <th>City</th>
+                                    <th class="text-right">Total Billed</th>
+                                    <th class="text-right">Total Received</th>
+                                    <th class="text-right">Balance Due</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="partyReceivableTableBody" class="divide-y divide-slate-100">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Trans Payable Section -->
+                <div id="transPayableSection" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>Supplier Name</th>
+                                    <th>City</th>
+                                    <th class="text-right">Total Truck Hire</th>
+                                    <th class="text-right">Advance Paid</th>
+                                    <th class="text-right">Balance Payable</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transPayableTableBody" class="divide-y divide-slate-100">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pending Trips Section -->
+                <div id="pendingTripsSection" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>LR No</th>
+                                    <th>Party</th>
+                                    <th>Supplier</th>
+                                    <th class="text-right">Party Due</th>
+                                    <th class="text-right">Supplier Due</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTripsTableBody" class="divide-y divide-slate-100">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 9. REPORTS (P&L) VIEW -->
+            <!-- ========================================================= -->
+            <div id="reportsView" class="view-container hidden space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Profit &amp; Loss (P&amp;L) Report</h2>
+                        <p class="text-xs text-slate-500">Calculate net margins across freight revenues, truck hire, commissions &amp; expenses</p>
+                    </div>
+                    <button onclick="triggerExportPnL()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        Export P&amp;L (Excel)
+                    </button>
+                </div>
+
+                <!-- Date Range Filter Bar -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold text-slate-600 uppercase">From:</span>
+                        <input id="reportFromDate" type="date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                        <span class="text-xs font-bold text-slate-600 uppercase">To:</span>
+                        <input id="reportToDate" type="date" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="renderReports()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow">
+                            Apply Filter
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 text-xs">
+                        <span class="text-slate-400 font-semibold mr-1">Presets:</span>
+                        <button onclick="setReportPreset('today')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded font-semibold text-slate-700">Today</button>
+                        <button onclick="setReportPreset('this_month')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded font-semibold text-slate-700">This Month</button>
+                        <button onclick="setReportPreset('last_month')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded font-semibold text-slate-700">Last Month</button>
+                        <button onclick="setReportPreset('all')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded font-semibold text-slate-700">All Time</button>
+                    </div>
+                </div>
+
+                <!-- P&L Metric Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[11px] font-bold uppercase text-slate-400 block">Total Trips</span>
+                        <span class="text-2xl font-black text-slate-900 mt-1 block" id="reportTotalTrips">0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 shadow-sm bg-gradient-to-br from-blue-50/50 to-white">
+                        <span class="text-[11px] font-bold uppercase text-blue-700 block">Freight Revenue</span>
+                        <span class="text-xl font-black text-blue-800 font-mono mt-1 block" id="reportTotalRevenue">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-rose-200 shadow-sm bg-gradient-to-br from-rose-50/50 to-white">
+                        <span class="text-[11px] font-bold uppercase text-rose-700 block">Truck Hire Cost</span>
+                        <span class="text-xl font-black text-rose-700 font-mono mt-1 block" id="reportTruckHire">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-purple-200 shadow-sm bg-gradient-to-br from-purple-50/50 to-white">
+                        <span class="text-[11px] font-bold uppercase text-purple-700 block">Net Commission</span>
+                        <span class="text-xl font-black text-purple-800 font-mono mt-1 block" id="reportCommission">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm bg-gradient-to-br from-amber-50/50 to-white">
+                        <span class="text-[11px] font-bold uppercase text-amber-700 block">Your Expenses</span>
+                        <span class="text-xl font-black text-amber-800 font-mono mt-1 block" id="reportExpenses">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-emerald-300 shadow-sm bg-gradient-to-br from-emerald-100/50 to-white">
+                        <span class="text-[11px] font-bold uppercase text-emerald-800 block">Net Profit</span>
+                        <span class="text-2xl font-black text-emerald-700 font-mono mt-1 block" id="reportNetProfit">₹0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm col-span-2 md:col-span-1">
+                        <span class="text-[11px] font-bold uppercase text-slate-500 block">Margin %</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono mt-1 block" id="reportMargin">0%</span>
+                    </div>
+                </div>
+
+                <!-- Trip-Wise Profitability Table -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-5 py-3 border-b border-slate-200 bg-slate-50 font-bold text-sm text-slate-800">
+                        Trip-Wise Profitability Statement
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left tms-table">
+                            <thead>
+                                <tr>
+                                    <th>LR No</th>
+                                    <th>Date</th>
+                                    <th>Party</th>
+                                    <th>Route</th>
+                                    <th class="text-right">Revenue (₹)</th>
+                                    <th class="text-right">Truck Hire (₹)</th>
+                                    <th class="text-right">Commission (₹)</th>
+                                    <th class="text-right">Net Profit (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MODALS & POPUPS -->
+    <!-- ================================================================= -->
+
+    <!-- 1. COMPREHENSIVE NEW TRIP / EDIT TRIP MODAL -->
+    <div id="newTripModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col border border-slate-200 modal-card">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2" id="tripModalTitle">
+                        Create New Trip
+                    </h3>
+                    <p class="text-xs text-slate-500">Lorry Receipt booking, freight terms &amp; live profit estimate</p>
+                </div>
+                <button onclick="closeModal('newTripModal')" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Form Body -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <form id="tripForm" class="space-y-6">
+
+                    <!-- Section 1: Party, Truck, Supplier & Driver -->
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">1. Parties, Fleet &amp; Supplier</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Party Selection with Quick Add -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-bold text-slate-700">Consignor Party *</label>
+                                    <button type="button" onclick="openQuickAddParty()" class="text-xs text-blue-600 hover:underline font-semibold">+ Add New Party</button>
+                                </div>
+                                <select id="tripPartySelect" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500">
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+
+                            <!-- Truck Selection with Quick Add -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-bold text-slate-700">Vehicle / Truck *</label>
+                                    <button type="button" onclick="openQuickAddTruck()" class="text-xs text-blue-600 hover:underline font-semibold">+ Add Truck</button>
+                                </div>
+                                <select id="tripTruckSelect" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500">
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+
+                            <!-- Supplier Selection with Quick Add -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-bold text-slate-700">Supplier / Transporter</label>
+                                    <button type="button" onclick="openQuickAddSupplier()" class="text-xs text-blue-600 hover:underline font-semibold">+ Add Supplier</button>
+                                </div>
+                                <select id="tripSupplierSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500">
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+
+                            <!-- Driver Selection -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Assigned Driver</label>
+                                <select id="tripDriverSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500">
+                                    <!-- Dynamic -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Route & Dates -->
+                    <div class="border-t border-slate-200 pt-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">2. Route &amp; Schedules</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Origin (Loading) *</label>
+                                <input id="tripOrigin" type="text" required placeholder="e.g. Bhiwandi, Mumbai" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Destination (Unloading) *</label>
+                                <input id="tripDestination" type="text" required placeholder="e.g. Whitefield, Bengaluru" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Start Date *</label>
+                                <input id="tripStartDate" type="date" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Expected Delivery Date</label>
+                                <input id="tripDeliveryDate" type="date" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Billing Info & Commissions -->
+                    <div class="border-t border-slate-200 pt-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">3. Billing &amp; Freight Economics</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <!-- Party Billing Type -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Party Billing Type *</label>
+                                <select id="tripBillingType" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="fixed">Fixed Freight Amount</option>
+                                    <option value="per_tonne">Per Tonne Rate</option>
+                                    <option value="per_kg">Per Kg Rate</option>
+                                </select>
+                            </div>
+
+                            <!-- Rate Container (Hidden for Fixed) -->
+                            <div id="tripRateContainer" class="hidden">
+                                <label class="block text-xs font-bold text-slate-700 mb-1" id="rateUnitLabel">Rate / Unit (₹)</label>
+                                <input id="tripRatePerUnit" type="number" step="any" placeholder="3500" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <!-- Cargo Weight -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Weight (Tonnes)</label>
+                                <input id="tripWeight" type="number" step="any" placeholder="22.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-3 bg-blue-50/50 rounded-xl border border-blue-100 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-blue-900 mb-1">Party Freight (₹) *</label>
+                                <input id="tripPartyFreight" type="number" required placeholder="95000" class="w-full px-3 py-2 bg-white border border-blue-200 rounded-lg text-sm font-bold text-blue-900 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-800 mb-1">Party Advance (₹)</label>
+                                <input id="tripPartyAdvance" type="number" placeholder="40000" class="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-sm font-semibold text-emerald-800 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-purple-900 mb-1">Truck Hire Cost (₹) *</label>
+                                <input id="tripTruckHireCost" type="number" required placeholder="68000" class="w-full px-3 py-2 bg-white border border-purple-200 rounded-lg text-sm font-bold text-purple-900 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-purple-800 mb-1">Advance to Supplier (₹)</label>
+                                <input id="tripSupplierAdvance" type="number" placeholder="30000" class="w-full px-3 py-2 bg-white border border-purple-200 rounded-lg text-sm font-semibold text-purple-800 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Commission Fields -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Commission from Party (₹)</label>
+                                <input id="tripCommFromParty" type="number" placeholder="0" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Commission from Truck Owner (₹)</label>
+                                <input id="tripCommFromTruck" type="number" placeholder="0" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Commission Paid to Agent (₹)</label>
+                                <input id="tripCommPaidAgent" type="number" placeholder="0" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Profit Calculation Display Banner -->
+                    <div class="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl shadow-inner flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs uppercase tracking-wider text-slate-400 block font-semibold">Live Trip Economics</span>
+                            <div class="text-xs text-slate-300 mt-0.5">
+                                Freight: <span id="calcPartyFreightDisplay" class="font-bold font-mono text-white">₹0</span> &bull; 
+                                Truck Hire: <span id="calcTruckHireDisplay" class="font-bold font-mono text-white">₹0</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <div class="text-right">
+                                <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Party Balance Due</span>
+                                <span id="calcPartyBalanceDisplay" class="font-bold font-mono text-amber-400">₹0</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Transporter Due</span>
+                                <span id="calcSuppBalanceDisplay" class="font-bold font-mono text-rose-400">₹0</span>
+                            </div>
+                            <div class="text-right pl-4 border-l border-slate-700">
+                                <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Estimated Net Profit</span>
+                                <span id="calcNetProfitDisplay" class="font-extrabold text-xl font-mono text-emerald-400">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Material Details & LR Meta -->
+                    <div class="border-t border-slate-200 pt-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">4. LR No. &amp; Consignment Details</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">LR / Bilty No. *</label>
+                                <input id="tripLrNo" type="text" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-blue-700 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Material Type</label>
+                                <input id="tripMaterialType" type="text" placeholder="FMCG / Steel / Cement" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Invoice No.</label>
+                                <input id="tripInvoiceNo" type="text" placeholder="INV-2026-081" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Invoice Value (₹)</label>
+                                <input id="tripInvoiceValue" type="number" placeholder="500000" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Trip Status</label>
+                                <select id="tripStatusSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold outline-none">
+                                    <option value="Created">Created</option>
+                                    <option value="In Transit">In Transit</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="POD Done">POD Done</option>
+                                    <option value="Closed">Closed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Notes / Instructions</label>
+                                <input id="tripNotes" type="text" placeholder="E-way bill verified, tarpaulin tied" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                        <button type="button" onclick="closeModal('newTripModal')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold shadow-lg transition">
+                            Save Trip
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. QUICK ADD PARTY MODAL (From Trip Form) -->
+    <div id="quickAddPartyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-base">Quick Add Party</h3>
+                <button type="button" onclick="closeModal('quickAddPartyModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="quickAddPartyForm" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Party Name *</label>
+                    <input id="quickPartyName" type="text" required placeholder="Tata Power Ltd" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Phone</label>
+                        <input id="quickPartyPhone" type="tel" placeholder="+91 98200 00000" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                        <input id="quickPartyCity" type="text" required placeholder="Pune" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">GST Number</label>
+                    <input id="quickPartyGst" type="text" placeholder="27AAACG0000A1Z5" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none uppercase font-mono">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('quickAddPartyModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Save &amp; Select</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. QUICK ADD TRUCK MODAL (From Trip Form) -->
+    <div id="quickAddTruckModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-base">Quick Add Truck</h3>
+                <button type="button" onclick="closeModal('quickAddTruckModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="quickAddTruckForm" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Truck / Vehicle No *</label>
+                    <input id="quickTruckNo" type="text" required placeholder="MH12RN4821" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none font-mono uppercase font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ownership *</label>
+                        <select id="quickTruckOwnership" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                            <option value="Market">Market</option>
+                            <option value="My">My (Own Fleet)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Capacity (Tonnes)</label>
+                        <input id="quickTruckCapacity" type="number" placeholder="25" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Vehicle Type</label>
+                    <input id="quickTruckType" type="text" placeholder="32ft MXL Container / 14 Wheeler" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('quickAddTruckModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Save &amp; Select</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. QUICK ADD SUPPLIER MODAL (From Trip Form) -->
+    <div id="quickAddSupplierModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-base">Quick Add Supplier / Transporter</h3>
+                <button type="button" onclick="closeModal('quickAddSupplierModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="quickAddSupplierForm" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Supplier Name *</label>
+                    <input id="quickSupplierName" type="text" required placeholder="Sharma Freight Carriers" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Phone</label>
+                        <input id="quickSupplierPhone" type="tel" placeholder="+91 98200 11223" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                        <input id="quickSupplierCity" type="text" required placeholder="Jaipur" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">GST Number</label>
+                    <input id="quickSupplierGst" type="text" placeholder="08AAACG1122B1Z3" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none uppercase font-mono">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('quickAddSupplierModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Save &amp; Select</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. ADD PARTY FULL MODAL -->
+    <div id="addPartyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-lg">Add New Consignor Party</h3>
+                <button type="button" onclick="closeModal('addPartyModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="partyForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Party Company Name *</label>
+                    <input id="partyName" type="text" required placeholder="Tata Steel Ltd" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Contact Person</label>
+                        <input id="partyContactPerson" type="text" placeholder="Suresh Gupta" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                        <input id="partyPhone" type="tel" required placeholder="+91 98200 44556" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                        <input id="partyCity" type="text" required placeholder="Jamshedpur" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Credit Days</label>
+                        <input id="partyCreditDays" type="number" value="30" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">GST Number</label>
+                    <input id="partyGst" type="text" placeholder="20AAACT2727Q1ZW" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none uppercase font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Full Factory / Godown Address</label>
+                    <textarea id="partyAddress" rows="2" placeholder="Plant No 4, Industrial Area..." class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('addPartyModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Add Party</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. ADD SUPPLIER FULL MODAL -->
+    <div id="addSupplierModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-lg">Add Transporter / Supplier</h3>
+                <button type="button" onclick="closeModal('addSupplierModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="supplierForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Transporter / Firm Name *</label>
+                    <input id="supplierName" type="text" required placeholder="Jaipur Golden Transport" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Contact Person</label>
+                        <input id="supplierContactPerson" type="text" placeholder="Mahesh Agarwal" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                        <input id="supplierPhone" type="tel" required placeholder="+91 98110 54321" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                        <input id="supplierCity" type="text" required placeholder="Delhi" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">GSTIN</label>
+                        <input id="supplierGst" type="text" placeholder="07AABCG9876H1Z1" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none uppercase font-mono">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Bank Details (Bank, A/C No, IFSC)</label>
+                    <input id="supplierBankDetails" type="text" placeholder="HDFC Bank - A/C 50200012345678, IFSC: HDFC0000128" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">UPI ID for Quick Settlements</label>
+                    <input id="supplierUpiId" type="text" placeholder="transporter@okhdfcbank" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('addSupplierModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Save Transporter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 7. ADD DRIVER FULL MODAL -->
+    <div id="addDriverModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-lg">Add Driver Khata</h3>
+                <button type="button" onclick="closeModal('addDriverModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="driverForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Driver Name *</label>
+                        <input id="driverName" type="text" required placeholder="Ramesh Singh" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
+                        <input id="driverMobile" type="tel" required placeholder="+91 98190 22345" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Driving License (DL) No.</label>
+                        <input id="driverLicenseNo" type="text" placeholder="MH12 20180045231" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none font-mono uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">UPI ID</label>
+                        <input id="driverUpiId" type="text" placeholder="ramesh@sbi" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Bank Account Details</label>
+                    <input id="driverBankDetails" type="text" placeholder="SBI - A/C 20194829104, IFSC: SBIN0001423" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Opening Balance</label>
+                        <input id="driverOpeningBalance" type="number" value="0" class="w-full px-2.5 py-1.5 bg-white border rounded text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-rose-700 mb-1">Driver Gave (Adv)</label>
+                        <input id="driverGaveInput" type="number" value="0" class="w-full px-2.5 py-1.5 bg-white border rounded text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-emerald-700 mb-1">Driver Got (Refund)</label>
+                        <input id="driverGotInput" type="number" value="0" class="w-full px-2.5 py-1.5 bg-white border rounded text-xs outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('addDriverModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Save Driver</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 8. ADD TRUCK FULL MODAL -->
+    <div id="addTruckModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-lg">Add Truck</h3>
+                <button type="button" onclick="closeModal('addTruckModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="truckForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Truck / Vehicle Registration No. *</label>
+                    <input id="truckNo" type="text" required placeholder="MH-12-RN-4821" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none uppercase font-mono font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ownership *</label>
+                        <select id="truckOwnership" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                            <option value="My">My Fleet (Own)</option>
+                            <option value="Market">Market Hired</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Capacity (Tonnes) *</label>
+                        <input id="truckCapacity" type="number" required placeholder="25" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Truck Type &amp; Body</label>
+                    <input id="truckType" type="text" placeholder="32ft Multi-Axle Container (MXL)" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Supplier / Transporter (if Market)</label>
+                    <select id="truckSupplierSelect" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('addTruckModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Close</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Confirm &amp; Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 9. ADD EXPENSE MODAL -->
+    <div id="addExpenseModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-lg">Record Operational Expense</h3>
+                <button type="button" onclick="closeModal('addExpenseModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="expenseForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Expense Category *</label>
+                    <select id="expenseCategory" required class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs font-semibold outline-none">
+                        <option value="Diesel">Diesel (Fuel)</option>
+                        <option value="Toll">Toll / Fastag</option>
+                        <option value="Driver">Driver Bhatta / Food</option>
+                        <option value="Maintenance">Maintenance / Repair</option>
+                        <option value="Other">Other / Police / Weighbridge</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Amount (₹) *</label>
+                        <input id="expenseAmount" type="number" required placeholder="5000" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Expense Date *</label>
+                        <input id="expenseDate" type="date" required class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Link to Trip (Optional)</label>
+                    <select id="expenseTripSelect" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                        <!-- Populated -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Payment Mode</label>
+                    <select id="expensePaymentMode" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                        <option value="Cash">Cash</option>
+                        <option value="Fastag Auto Debit">Fastag Auto Debit</option>
+                        <option value="Fuel Card (IOCL/BPCL)">Fuel Card (IOCL/BPCL)</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Notes / Slip No.</label>
+                    <input id="expenseNotes" type="text" placeholder="Pump slip #9918" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('addExpenseModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Log Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 10. RECORD PARTY PAYMENT MODAL -->
+    <div id="recordPartyPaymentModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-lg">Receive Party Payment</h3>
+                    <span id="partyPayPartyNameDisplay" class="text-xs text-blue-600 font-bold block">Party Name</span>
+                </div>
+                <button type="button" onclick="closeModal('recordPartyPaymentModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="partyPaymentForm" class="space-y-4">
+                <input type="hidden" id="partyPayPartyId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Link to Specific Pending Trip</label>
+                    <select id="partyPayTripSelect" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                        <!-- Dynamically filled -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Amount Received (₹) *</label>
+                        <input id="partyPayAmount" type="number" required placeholder="50000" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Payment Date *</label>
+                        <input id="partyPayDate" type="date" required class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Payment Mode</label>
+                        <select id="partyPayMode" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                            <option value="NEFT / RTGS">NEFT / RTGS</option>
+                            <option value="Cheque Cleared">Cheque Cleared</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Cash">Cash</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ref / UTR / Chq No.</label>
+                        <input id="partyPayRef" type="text" placeholder="UTR-991823" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Notes</label>
+                    <input id="partyPayNotes" type="text" placeholder="Clearance against stamped POD" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('recordPartyPaymentModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Confirm Receipt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 11. SETTLE SUPPLIER PAYMENT MODAL -->
+    <div id="settleSupplierPaymentModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-lg">Settle Transporter / Supplier</h3>
+                    <span id="supplierPaySupplierNameDisplay" class="text-xs text-purple-700 font-bold block">Supplier Name</span>
+                </div>
+                <button type="button" onclick="closeModal('settleSupplierPaymentModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <form id="supplierPaymentForm" class="space-y-4">
+                <input type="hidden" id="supplierPaySupplierId">
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600">
+                    <strong>Bank on File:</strong> <span id="supplierPayBankDisplay" class="font-mono text-slate-800">Bank Details</span>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Link to Specific Trip</label>
+                    <select id="supplierPayTripSelect" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                        <!-- Dynamically filled -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Amount Paid (₹) *</label>
+                        <input id="supplierPayAmount" type="number" required placeholder="30000" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Payment Date *</label>
+                        <input id="supplierPayDate" type="date" required class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Payment Mode</label>
+                        <select id="supplierPayMode" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                            <option value="IMPS">IMPS</option>
+                            <option value="NEFT">NEFT</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Cash">Cash</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ref / UTR No.</label>
+                        <input id="supplierPayRef" type="text" placeholder="IMPS/624910284" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Notes</label>
+                    <input id="supplierPayNotes" type="text" placeholder="Settlement at unloading point" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('settleSupplierPaymentModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow">Confirm Settlement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 12. POD (PROOF OF DELIVERY) ATTACHMENT MODAL -->
+    <div id="podModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 modal-card max-h-[92vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Attach Proof of Delivery (POD)
+                    </h3>
+                    <span id="podModalLrNo" class="text-xs text-blue-600 font-bold block">LR-2026-1001</span>
+                </div>
+                <button type="button" onclick="closeModal('podModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+
+            <form id="podUploadForm" class="space-y-4 flex-1 overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Receiver Name / Stamped By *</label>
+                    <input id="podReceiverName" type="text" required placeholder="Warehouse Incharge / Gate Receiver" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Delivered &amp; Received Date *</label>
+                    <input id="podReceivedDate" type="date" required class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Upload Stamped Bilty / Delivery Receipt</label>
+                    <input id="podFileInput" type="file" accept="image/*,.pdf" class="w-full px-3 py-1.5 bg-slate-50 border rounded-lg text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200">
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-[11px] text-slate-400">JPG, PNG, WebP or Camera Snap</span>
+                        <button type="button" onclick="attachSamplePod()" class="text-xs text-purple-700 hover:underline font-bold">+ Use Stamped Demo POD</button>
+                    </div>
+                </div>
+
+                <!-- Preview Area -->
+                <div id="podPreviewContainer" class="hidden border border-slate-200 rounded-lg p-2 bg-slate-50 text-center">
+                    <span class="text-[11px] text-slate-500 font-semibold block mb-1">Attached Document Preview:</span>
+                    <img id="podPreviewImg" src="" alt="POD Preview" class="max-h-44 mx-auto rounded border shadow-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Verification Remarks</label>
+                    <textarea id="podNotes" rows="2" placeholder="Clean receipt, seal intact, no shortage reported" class="w-full px-3.5 py-2 bg-slate-50 border rounded-lg text-xs outline-none"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('podModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg shadow">
+                        Save &amp; Mark POD Done
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 13. CHANGE STATUS MODAL -->
+    <div id="changeStatusModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 modal-card">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-900 text-base">Update Trip Status</h3>
+                <button type="button" onclick="closeModal('changeStatusModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <span id="statusModalLrNo" class="text-xs font-bold text-blue-600 block">LR-2026-1001</span>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Select New Status</label>
+                    <select id="updateTripStatusSelect" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm font-semibold outline-none">
+                        <option value="Created">Created</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="POD Done">POD Done</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('changeStatusModal')" class="px-4 py-2 bg-slate-100 text-xs font-semibold rounded-lg">Cancel</button>
+                    <button type="button" onclick="handleConfirmTripStatus()" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14. PRINTABLE LORRY RECEIPT (LR / BILTY) MODAL -->
+    <div id="printLrModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full border border-slate-300 max-h-[95vh] flex flex-col modal-card">
+            <div class="px-6 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl no-print">
+                <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Printable Consignment Note / Lorry Receipt (Bilty)
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="triggerPrintLr()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print LR
+                    </button>
+                    <button onclick="closeModal('printLrModal')" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg">&times;</button>
+                </div>
+            </div>
+
+            <!-- Print Area -->
+            <div id="lrPrintArea" class="flex-1 overflow-y-auto p-6">
+                <div id="lrDocumentContainer">
+                    <!-- Formatted dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 15. PARTY LEDGER MODAL -->
+    <div id="partyLedgerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-slate-200 modal-card">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl">
+                <div>
+                    <h3 id="partyLedgerTitle" class="font-bold text-slate-900 text-base">Party Ledger</h3>
+                    <div class="flex gap-4 text-xs mt-1">
+                        <span>Total Billed: <strong id="ledgerPartyTotalBilled" class="font-mono text-slate-900">₹0</strong></span>
+                        <span>Total Advance: <strong id="ledgerPartyTotalAdv" class="font-mono text-emerald-600">₹0</strong></span>
+                        <span>Current Due: <strong id="ledgerPartyTotalDue" class="font-mono text-amber-600">₹0</strong></span>
+                    </div>
+                </div>
+                <button onclick="closeModal('partyLedgerModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4">
+                <table class="w-full text-left tms-table">
+                    <thead>
+                        <tr>
+                            <th>LR No</th>
+                            <th>Date</th>
+                            <th>Route</th>
+                            <th>Vehicle</th>
+                            <th class="text-right">Freight (₹)</th>
+                            <th class="text-right">Advance (₹)</th>
+                            <th class="text-right">Balance Due (₹)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partyLedgerTableBody" class="divide-y divide-slate-100 text-xs">
+                        <!-- Dynamic -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 16. TRIP DETAIL INSPECTION MODAL -->
+    <div id="tripDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 border border-slate-200 modal-card max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 id="tripDetailTitle" class="font-bold text-slate-900 text-lg">Trip Details</h3>
+                <button onclick="closeModal('tripDetailModal')" class="text-slate-400 hover:text-slate-600">&times;</button>
+            </div>
+            <div id="tripDetailContent" class="flex-1 overflow-y-auto">
+                <!-- Dynamically filled -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Floating Action Button (FAB) for New Trip -->
+    <button type="button" class="btn-new-trip sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-full shadow-2xl flex items-center justify-center border-2 border-white transition-transform" title="Create New Trip" aria-label="Create New Trip">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+    </button>
+
+    <!-- Supabase Client & Cloud Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+
+    <!-- Application Core Scripts -->
+    <script src="js/store.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
